@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 py-8 px-4" x-data="{ searchTerm: '', selectedCategory: '', items: {{ Js::from($groceryItems) }}, categories: {{ Js::from($categories) }} }">
     <div class="container mx-auto max-w-3xl">
 
@@ -130,3 +133,4 @@
         }
     </style>
 </div>
+@endsection
