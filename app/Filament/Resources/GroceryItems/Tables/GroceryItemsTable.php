@@ -17,7 +17,6 @@ class GroceryItemsTable
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('category.name')->searchable()->sortable(),
                 TextColumn::make('unit.name')->searchable()->sortable(),
-                TextColumn::make('quantity')->sortable(),
             ])
             ->filters([
                 //

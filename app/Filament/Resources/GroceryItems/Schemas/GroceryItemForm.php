@@ -31,9 +31,6 @@ class GroceryItemForm
                             ->required()
                             ->maxLength(255),
                     ]),
-                TextInput::make('quantity')
-                    ->required()
-                    ->numeric(),
             ]);
     }
 }

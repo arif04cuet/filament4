@@ -15,7 +15,6 @@ class GroceryItem extends Model
         'name',
         'category_id',
         'unit_id',
-        'quantity',
     ];
 
     public function category(): BelongsTo
