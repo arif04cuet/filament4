@@ -41,8 +41,6 @@ class GroceryItemResource extends Resource
     {
         return [
             'index' => ListGroceryItems::route('/'),
-            'create' => CreateGroceryItem::route('/create'),
-            'edit' => EditGroceryItem::route('/{record}/edit'),
         ];
     }
 }
