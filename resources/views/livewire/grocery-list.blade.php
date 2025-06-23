@@ -1,7 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 py-8 px-4" x-data="{ searchTerm: '', selectedCategory: '', items: {{ Js::from($groceryItems) }}, categories: {{ Js::from($categories) }} }">
+<div class="min-h-screen bg-gradient-to-br from-slate-100 to-sky-100 py-8 px-4"
+     x-data="{
+        searchTerm: '',
+        selectedCategory: '',
+        items: {{ Js::from($groceryItems->map(function($item) { $item->selected = false; $item->quantity_val = ''; return $item; })) }},
+        categories: {{ Js::from($categories) }}
+     }">
     <div class="container mx-auto max-w-3xl">
 
         <header class="mb-10 text-center">
@@ -33,36 +39,32 @@
         </div>
 
         <!-- Grocery Items List -->
-        <div class="space-y-5">
+        <div class="space-y-3"> <!-- Reduced space for compactness -->
             <template x-for="item in items.filter(i => (searchTerm === '' || i.name.toLowerCase().includes(searchTerm.toLowerCase())) && (selectedCategory === '' || i.category_id == selectedCategory))" :key="item.id">
-                <div x-data="{ checked: false }" class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                             <input type="checkbox" x-model="checked" :id="'item-checkbox-' + item.id"
-                                   class="form-checkbox h-6 w-6 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out cursor-pointer">
-                            <div>
-                                <label :for="'item-checkbox-' + item.id" class="cursor-pointer">
-                                    <h2 class="text-xl font-semibold text-gray-800" x-text="item.name"></h2>
-                                </label>
-                                <p class="text-sm text-gray-500">
-                                    <span class="font-medium" x-text="item.category.name"></span> &bull; <span class="italic" x-text="item.unit.name"></span>
+                        <div class="flex items-center flex-grow gap-3">
+                            <input type="checkbox" x-model="item.selected" :id="'item-checkbox-' + item.id"
+                                   class="form-checkbox h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 focus:ring-offset-1 transition duration-150 ease-in-out cursor-pointer flex-shrink-0">
+                            <label :for="'item-checkbox-' + item.id" class="cursor-pointer flex-grow">
+                                <span class="text-lg font-medium text-gray-800" x-text="item.name"></span>
+                                <p class="text-xs text-gray-500">
+                                    <span x-text="item.category.name"></span>
                                 </p>
-                            </div>
+                            </label>
                         </div>
-                    </div>
-                    <div x-show="checked" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform -translate-y-2" x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 transform translate-y-0" x-transition:leave-end="opacity-0 transform -translate-y-2"
-                         class="mt-4 pt-4 border-t border-gray-200">
-                        <label :for="'quantity-' + item.id" class="block text-sm font-medium text-gray-700 mb-1">Quantity for <span x-text="item.name" class="font-semibold"></span>:</label>
-                        <input type="text" :id="'quantity-' + item.id" placeholder="e.g., 2, 1 pack"
-                               class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+                        <div x-show="item.selected" class="flex items-center gap-2 ml-3 flex-shrink-0" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform scale-90" x-transition:enter-end="opacity-100 transform scale-100">
+                            <input type="text" x-model="item.quantity_val" :id="'quantity-' + item.id" placeholder="Qty"
+                                   class="w-16 p-1 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+                            <label :for="'quantity-' + item.id" class="text-sm font-bold text-gray-700" x-text="item.unit.name"></label>
+                        </div>
                     </div>
                 </div>
             </template>
 
             <!-- No items message -->
             <template x-if="items.filter(i => (searchTerm === '' || i.name.toLowerCase().includes(searchTerm.toLowerCase())) && (selectedCategory === '' || i.category_id == selectedCategory)).length === 0">
-                <div class="text-center py-12 bg-white rounded-xl shadow-md">
+                <div class="text-center py-10 bg-white rounded-lg shadow-md"> <!-- Adjusted padding -->
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
