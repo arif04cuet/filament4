@@ -17,10 +17,20 @@ class GroceryItemForm
                     ->maxLength(255),
                 Select::make('category_id')
                     ->relationship('category', 'name')
-                    ->required(),
+                    ->required()
+                    ->createOptionForm([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                    ]),
                 Select::make('unit_id')
                     ->relationship('unit', 'name')
-                    ->required(),
+                    ->required()
+                    ->createOptionForm([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                    ]),
                 TextInput::make('quantity')
                     ->required()
                     ->numeric(),
