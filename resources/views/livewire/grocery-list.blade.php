@@ -16,13 +16,16 @@
         },
         showPreview: false,
         getFormattedShareText() {
-            let text = 'Heres my grocery list:\n'; 
-            this.items. filter(i=> i.selected && i.quantity_val).forEach(item=> {
-                text += `- ${item.name} (${item.quantity_val} ${item.unit.name})\n`;
-            });
-
-            return text;
-        }
+            let text = " Here's my grocery list:\n"; this.items.filter(i=> i.selected && i.quantity_val).forEach(item
+    => {
+    text += `- ${item.name} (${item.quantity_val} ${item.unit.name})\n`;
+    });
+    return text;
+    },
+    get anyItemSelected() {
+    return this.items.some(item => item.selected);
+    },
+    shareEmail: ''
     }">
     <div class="container mx-auto max-w-3xl">
 
@@ -33,19 +36,6 @@
             </h1>
             <p class="text-lg text-gray-600">Manage your shopping items with ease.</p>
         </header>
-
-
-        <!-- Action Buttons -->
-        <div class="mb-6 flex justify-start space-x-3">
-            <button @click="resetList()"
-                class="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition ease-in-out duration-150">
-                Reset List
-            </button>
-            <button @click="showPreview = true"
-                class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition ease-in-out duration-150">
-                Preview List
-            </button>
-        </div>
 
         <!-- Search and Filter -->
         <div class="mb-8 p-6 bg-white rounded-xl shadow-lg">
@@ -68,6 +58,20 @@
                     </select>
                 </div>
             </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mb-6 flex justify-between items-center">
+            <button @click="resetList()"
+                class="px-4 py-2 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition ease-in-out duration-150">
+                Reset List
+            </button>
+            <button x-show="anyItemSelected" @click="showPreview = true"
+                class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition ease-in-out duration-150"
+                style="display: none;">
+                <!-- Initially hidden if no items are selected, managed by Alpine x-show -->
+                Preview List
+            </button>
         </div>
 
         <!-- Grocery Items List -->
@@ -93,8 +97,10 @@
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 transform scale-90"
                             x-transition:enter-end="opacity-100 transform scale-100">
-                            <input type="text" x-model="item.quantity_val" :id="'quantity-' + item.id" placeholder="Qty"
-                                class="w-16 p-1 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+                            <input type="number" min="1" x-model.number="item.quantity_val"
+                                @input="item.quantity_val = item.quantity_val ? parseInt(item.quantity_val) || 1 : null; if(item.quantity_val < 1 && item.quantity_val !== null) item.quantity_val = 1;"
+                                :id="'quantity-' + item.id" placeholder="Qty"
+                                class="w-20 p-1 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                             <label :for="'quantity-' + item.id" class="text-sm font-bold text-gray-700"
                                 x-text="item.unit.name"></label>
                         </div>
@@ -194,7 +200,6 @@
         }
     </style>
 
-
     <!-- Preview Modal -->
     <div x-show="showPreview" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50"
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
@@ -211,10 +216,7 @@
             <div class="space-y-3">
                 <template x-for="item in items.filter(i => i.selected && i.quantity_val)" :key="item.id">
                     <div class="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                        <div>
-                            <span class="font-medium text-gray-700" x-text="item.name"></span>
-                            <span class="text-sm text-gray-500" x-text="'(' + item.category.name + ')'"></span>
-                        </div>
+                        <span class="font-medium text-gray-700" x-text="item.name"></span>
                         <div class="font-semibold text-gray-800">
                             <span x-text="item.quantity_val"></span>
                             <span class="font-bold" x-text="item.unit.name"></span>
@@ -230,8 +232,14 @@
             <!-- Sharing options will be added here in the next step -->
             <div class="mt-6 pt-4 border-t">
                 <h4 class="text-lg font-medium text-gray-700 mb-3">Share this list:</h4>
+                <div class="mb-4">
+                    <label for="shareEmailInput" class="block text-sm font-medium text-gray-700 mb-1">Recipient's Email
+                        (optional):</label>
+                    <input type="email" id="shareEmailInput" x-model="shareEmail" placeholder="Enter email address"
+                        class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
+                </div>
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:space-x-3">
-                    <a :href="'mailto:?subject=My Grocery List&body=' + encodeURIComponent(getFormattedShareText())"
+                    <a :href="'mailto:' + shareEmail + '?subject=My Grocery List&body=' + encodeURIComponent(getFormattedShareText())"
                         class="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75 transition ease-in-out duration-150">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20"
                             fill="currentColor">
@@ -271,6 +279,5 @@
             </div>
         </div>
     </div>
-
 </div>
 @endsection
