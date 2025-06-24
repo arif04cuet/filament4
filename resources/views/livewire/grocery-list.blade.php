@@ -6,6 +6,7 @@
         searchTerm: '',
         selectedCategory: '',
         items: {{ Js::from($groceryItems->map(function($item) { $item->selected = false; $item->quantity_val = ''; return $item; })) }},
+
         categories: {{ Js::from($categories) }},
         resetList() {
             this.searchTerm = '';
@@ -23,6 +24,7 @@
             });
             return text;
         }
+
      }">
     <div class="container mx-auto max-w-3xl">
 
@@ -32,6 +34,7 @@
             </h1>
             <p class="text-lg text-gray-600">Manage your shopping items with ease.</p>
         </header>
+
 
         <!-- Action Buttons -->
         <div class="mb-6 flex justify-start space-x-3">
@@ -163,6 +166,7 @@
         }
     </style>
 
+
     <!-- Preview Modal -->
     <div x-show="showPreview"
          class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50"
@@ -228,5 +232,6 @@
             </div>
         </div>
     </div>
+
 </div>
 @endsection
